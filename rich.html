@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>MAJESTIC RACING</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#111;
+  font-family:Arial,sans-serif;
+  touch-action:none;
+}
+
+#game{
+  display:block;
+  width:100vw;
+  height:100vh;
+  background:#27852b;
+}
+
+#hud{
+  position:fixed;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  width:94%;
+  max-width:430px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  text-shadow:2px 2px 4px #000;
+  z-index:10;
+}
+
+#pause{
+  position:fixed;
+  top:48px;
+  right:12px;
+  padding:10px 13px;
+  border:2px solid white;
+  border-radius:12px;
+  background:rgba(0,0,0,.55);
+  color:white;
+  font-weight:bold;
+  font-size:13px;
+  z-index:20;
+}
+
+.control{
+  position:fixed;
+  bottom:22px;
+  width:105px;
+  height:88px;
+  border:3px solid white;
+  border-radius:24px;
+  background:rgba(0,0,0,.48);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:42px;
+  z-index:20;
+  touch-action:none;
+}
+
+#left{
+  left:18px;
+}
+
+#right{
+  right:18px;
+}
+
+.control:active{
+  background:rgba(255,255,255,.3);
+}
+
+#message{
+  position:fixed;
+  top:43%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:90%;
+  text-align:center;
+  color:white;
+  text-shadow:3px 3px 6px #000;
+  z-index:30;
+  pointer-events:none;
+}
+
+#message h1{
+  font-size:38px;
+  margin-bottom:8px;
+}
+
+#message p{
+  font-size:17px;
+}
+
+#replay{
+  display:none;
+  position:fixed;
+  left:50%;
+  bottom:130px;
+  transform:translateX(-50%);
+  padding:15px 35px;
+  border:3px solid white;
+  border-radius:16px;
+  background:#ffd000;
+  color:#111;
+  font-size:19px;
+  font-weight:bold;
+  z-index:40;
+}
+
+#sound{
+  position:fixed;
+  top:48px;
+  left:12px;
+  padding:10px 13px;
+  border:2px solid white;
+  border-radius:12px;
+  background:rgba(0,0,0,.55);
+  color:white;
+  font-weight:bold;
+  font-size:13px;
+  z-index:20;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="game"></canvas>
+
+<div id="hud">
+  <span>🏁 <b id="score">0</b></span>
+  <span>🪙 <b id="coins">0</b></span>
