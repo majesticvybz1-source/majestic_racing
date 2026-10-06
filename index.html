@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAJESTIC RACING</title>
+</head>
+
+<body style="text-align:center;background:#111;color:white;font-family:Arial;">
+
+<h1>🏎️ MAJESTIC RACING</h1>
+
+<canvas id="game" width="360" height="600"
+style="background:#555;border:3px solid white;max-width:95%;"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let car = {
+    x: 155,
+    y: 500,
+    width: 50,
+    height: 90
+};
+
+let enemy = {
+    x: 80,
+    y: -100,
+    width: 50,
+    height: 90
+};
+
+let score = 0;
+let speed = 5;
+let left = false;
+let right = false;
+
+function drawRoad() {
+    ctx.fillStyle = "#555";
+    ctx.fillRect(0, 0, 360, 600);
+
+    ctx.fillStyle = "white";
+
+    for (let y = -20; y < 600; y += 80) {
+        ctx.fillRect(175, y, 10, 45);
+    }
+}
+
+function drawCar() {
+    ctx.fillStyle = "red";
+    ctx.fillRect(car.x, car.y, car.width, car.height);
+
+    ctx.fillStyle = "black";
+    ctx.fillRect(car.x + 8, car.y + 15, 34, 20);
+    ctx.fillRect(car.x + 8, car.y + 55, 34, 20);
+}
+
+function drawEnemy() {
+    ctx.fillStyle = "blue";
+    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+}
+
+function collision() {
+    return (
+        car.x < enemy.x + enemy.width &&
+        car.x + car.width > enemy.x &&
+        car.y < enemy.y + enemy.height &&
+        car.y + car.height > enemy.y
+    );
+}
+
+function gameLoop() {
+    drawRoad();
+
+    if (left && car.x > 10) car.x -= 6;
+    if (right && car.x < 300) car.x += 6;
+
+    enemy.y += speed;
+
+    if (enemy.y > 600) {
+        enemy.y = -100;
+        enemy.x = Math.random() * 300;
+        score++;
+    }
+
+    if (collision()) {
+        alert("💥 CRASH! Score: " + score);
+        location.reload();
+    }
+
+    drawCar();
+    drawEnemy();
+
+    ctx.fillStyle = "white";
+    ctx.font = "20px Arial";
+    ctx.fillText("Score: " + score, 10, 30);
+
+    requestAnimationFrame(gameLoop);
+}
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "ArrowLeft") left = true;
+    if (e.key === "ArrowRight") right = true;
+});
+
+document.addEventListener("keyup", function(e) {
+    if (e.key === "ArrowLeft") left = false;
+    if (e.key === "ArrowRight") right = false;
+});
+
+gameLoop();
+</script>
+
+</body>
+</html>
