@@ -1,66 +1,203 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAJESTIC RACING</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAJESTIC RACING</title>
+
+<style>
+    body {
+        margin: 0;
+        background: #111;
+        color: white;
+        text-align: center;
+        font-family: Arial;
+        touch-action: none;
+    }
+
+    h1 {
+        margin: 10px;
+        font-size: 26px;
+    }
+
+    #game {
+        width: 360px;
+        max-width: 95vw;
+        height: auto;
+        border: 3px solid white;
+        background: #555;
+    }
+
+    .controls {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 15px;
+    }
+
+    button {
+        width: 120px;
+        height: 65px;
+        font-size: 28px;
+        font-weight: bold;
+        border: none;
+        border-radius: 15px;
+        background: #222;
+        color: white;
+    }
+
+    button:active {
+        background: #555;
+    }
+
+    #restart {
+        margin-top: 15px;
+        width: 180px;
+        height: 50px;
+        font-size: 18px;
+    }
+</style>
 </head>
 
-<body style="text-align:center;background:#111;color:white;font-family:Arial;">
+<body>
 
 <h1>🏎️ MAJESTIC RACING</h1>
 
-<canvas id="game" width="360" height="600"
-style="background:#555;border:3px solid white;max-width:95%;"></canvas>
+<canvas id="game" width="360" height="600"></canvas>
+
+<div class="controls">
+    <button id="left">⬅️ LEFT</button>
+    <button id="right">RIGHT ➡️</button>
+</div>
+
+<button id="restart">🔄 RESTART</button>
 
 <script>
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-let car = {
-    x: 155,
-    y: 500,
-    width: 50,
-    height: 90
-};
+let car;
+let enemy;
+let score;
+let speed;
+let gameOver;
 
-let enemy = {
-    x: 80,
-    y: -100,
-    width: 50,
-    height: 90
-};
+function startGame() {
 
-let score = 0;
-let speed = 5;
-let left = false;
-let right = false;
+    car = {
+        x: 155,
+        y: 490,
+        width: 50,
+        height: 90
+    };
 
+    enemy = {
+        x: Math.random() * 300,
+        y: -120,
+        width: 50,
+        height: 90
+    };
+
+    score = 0;
+    speed = 5;
+    gameOver = false;
+
+    gameLoop();
+}
+
+
+// Draw road
 function drawRoad() {
+
     ctx.fillStyle = "#555";
     ctx.fillRect(0, 0, 360, 600);
 
+    // Road edges
+    ctx.fillStyle = "#222";
+    ctx.fillRect(0, 0, 20, 600);
+    ctx.fillRect(340, 0, 20, 600);
+
+    // Road lines
     ctx.fillStyle = "white";
 
-    for (let y = -20; y < 600; y += 80) {
+    for (let y = 0; y < 600; y += 80) {
         ctx.fillRect(175, y, 10, 45);
     }
 }
 
+
+// Draw player's car
 function drawCar() {
+
     ctx.fillStyle = "red";
-    ctx.fillRect(car.x, car.y, car.width, car.height);
+    ctx.fillRect(
+        car.x,
+        car.y,
+        car.width,
+        car.height
+    );
+
+    // Windows
+    ctx.fillStyle = "black";
+
+    ctx.fillRect(
+        car.x + 8,
+        car.y + 12,
+        34,
+        25
+    );
+
+    ctx.fillRect(
+        car.x + 8,
+        car.y + 52,
+        34,
+        25
+    );
+
+    // Wheels
+    ctx.fillStyle = "#111";
+
+    ctx.fillRect(car.x - 5, car.y + 15, 8, 22);
+    ctx.fillRect(car.x + 47, car.y + 15, 8, 22);
+
+    ctx.fillRect(car.x - 5, car.y + 55, 8, 22);
+    ctx.fillRect(car.x + 47, car.y + 55, 8, 22);
+}
+
+
+// Draw enemy car
+function drawEnemy() {
+
+    ctx.fillStyle = "blue";
+
+    ctx.fillRect(
+        enemy.x,
+        enemy.y,
+        enemy.width,
+        enemy.height
+    );
 
     ctx.fillStyle = "black";
-    ctx.fillRect(car.x + 8, car.y + 15, 34, 20);
-    ctx.fillRect(car.x + 8, car.y + 55, 34, 20);
+
+    ctx.fillRect(
+        enemy.x + 8,
+        enemy.y + 12,
+        34,
+        25
+    );
+
+    ctx.fillRect(
+        enemy.x + 8,
+        enemy.y + 52,
+        34,
+        25
+    );
 }
 
-function drawEnemy() {
-    ctx.fillStyle = "blue";
-    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-}
 
+// Collision
 function collision() {
+
     return (
         car.x < enemy.x + enemy.width &&
         car.x + car.width > enemy.x &&
@@ -69,46 +206,163 @@ function collision() {
     );
 }
 
-function gameLoop() {
-    drawRoad();
 
-    if (left && car.x > 10) car.x -= 6;
-    if (right && car.x < 300) car.x += 6;
+// Move left
+function moveLeft() {
+
+    car.x -= 8;
+
+    if (car.x < 25) {
+        car.x = 25;
+    }
+}
+
+
+// Move right
+function moveRight() {
+
+    car.x += 8;
+
+    if (car.x > 285) {
+        car.x = 285;
+    }
+}
+
+
+// Game loop
+function gameLoop() {
+
+    if (gameOver) return;
+
+    drawRoad();
 
     enemy.y += speed;
 
     if (enemy.y > 600) {
-        enemy.y = -100;
-        enemy.x = Math.random() * 300;
+
+        enemy.y = -120;
+
+        enemy.x =
+            25 + Math.random() * 260;
+
         score++;
+
+        // Make game faster
+        if (score % 5 === 0) {
+            speed += 1;
+        }
     }
 
     if (collision()) {
-        alert("💥 CRASH! Score: " + score);
-        location.reload();
+
+        gameOver = true;
+
+        ctx.fillStyle = "rgba(0,0,0,0.7)";
+        ctx.fillRect(0, 0, 360, 600);
+
+        ctx.fillStyle = "white";
+        ctx.font = "35px Arial";
+        ctx.fillText(
+            "💥 CRASH!",
+            105,
+            270
+        );
+
+        ctx.font = "22px Arial";
+        ctx.fillText(
+            "Score: " + score,
+            135,
+            315
+        );
+
+        return;
     }
 
-    drawCar();
     drawEnemy();
+    drawCar();
 
     ctx.fillStyle = "white";
     ctx.font = "20px Arial";
-    ctx.fillText("Score: " + score, 10, 30);
+
+    ctx.fillText(
+        "Score: " + score,
+        30,
+        35
+    );
 
     requestAnimationFrame(gameLoop);
 }
 
-document.addEventListener("keydown", function(e) {
-    if (e.key === "ArrowLeft") left = true;
-    if (e.key === "ArrowRight") right = true;
-});
 
-document.addEventListener("keyup", function(e) {
-    if (e.key === "ArrowLeft") left = false;
-    if (e.key === "ArrowRight") right = false;
-});
+// LEFT button
+const leftButton =
+    document.getElementById("left");
 
-gameLoop();
+leftButton.addEventListener(
+    "touchstart",
+    function(e) {
+        e.preventDefault();
+        moveLeft();
+    }
+);
+
+leftButton.addEventListener(
+    "click",
+    function() {
+        moveLeft();
+    }
+);
+
+
+// RIGHT button
+const rightButton =
+    document.getElementById("right");
+
+rightButton.addEventListener(
+    "touchstart",
+    function(e) {
+        e.preventDefault();
+        moveRight();
+    }
+);
+
+rightButton.addEventListener(
+    "click",
+    function() {
+        moveRight();
+    }
+);
+
+
+// Keyboard controls too
+document.addEventListener(
+    "keydown",
+    function(e) {
+
+        if (e.key === "ArrowLeft") {
+            moveLeft();
+        }
+
+        if (e.key === "ArrowRight") {
+            moveRight();
+        }
+    }
+);
+
+
+// Restart
+document.getElementById("restart")
+.addEventListener(
+    "click",
+    function() {
+        startGame();
+    }
+);
+
+
+// Start
+startGame();
+
 </script>
 
 </body>
